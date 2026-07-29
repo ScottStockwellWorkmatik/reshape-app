@@ -72,7 +72,7 @@ body{font-family:'Neue Haas Grotesk Display Pro',Helvetica,Arial,sans-serif;back
 .osel.def{border:1.5px solid #D9D9D9;background:#fff}
 .osel.ovr{border:1.5px solid #F25D27;background:#FFF1EB;color:#F25D27;font-weight:700}
 .ph{display:flex;align-items:center;justify-content:center;height:100%;color:#7C8B93;font-size:13px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.g4{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
 .card{background:#fff;border-radius:10px;padding:18px 20px 14px;border-top:4px solid #F25D27;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
 .clabel{font-size:10px;font-weight:700;color:#7C8B93;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
 .cval{font-size:38px;font-weight:800;color:#0D0D0D;line-height:1}
@@ -387,7 +387,8 @@ function renderDash(){
     {label:"Roles in Scope", val:m.scopedRoles, sub:'of ' + m.totalRoles + ' roles', pct: Math.round(m.scopedRoles/m.totalRoles*100)||0, accent:C.primary},
     {label:"Activities in Scope", val:m.total, sub:'of ' + totalActs + ' total activities', pct: Math.round(m.total/totalActs*100)||0, accent:C.blue},
     {label:"Full Automation", val:m.counts[FA]||0, sub:"of selected activities", pct:m.pcts[FA]||0, accent:C.darkblue},
-    {label:"Human Only", val:m.counts[HO]||0, sub:"of selected activities", pct:m.pcts[HO]||0, accent:C.primary},
+{label:"Augmentation", val:m.counts[AUG]||0, sub:"of selected activities", pct:m.pcts[AUG]||0, accent:"#0C6E9E"},
+{label:"Human Only", val:m.counts[HO]||0, sub:"of selected activities", pct:m.pcts[HO]||0, accent:C.primary},
   ];
   let h = '<div class="g4">';
   cards.forEach(c=>{
