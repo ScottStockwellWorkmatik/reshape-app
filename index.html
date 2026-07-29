@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workmatik RESHAPE - Examine Roles</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Neue Haas Grotesk Display Pro',Helvetica,Arial,sans-serif;background:#EAF9FF;color:#0D0D0D;min-height:100vh}
+#bap{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.hdr{background:#0D0D0D;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,0.25)}
+.htitle{font-size:17px;font-weight:700;color:#F25D27;letter-spacing:0.2px}
+.hsub{font-size:11px;color:#8A8A8A;margin-top:2px}
+.tabs{display:flex;gap:8px}
+.tab{padding:8px 20px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:all .15s}
+.tab.on{background:#F25D27;color:#FFFFFF}
+.tab.off{background:rgba(255,255,255,0.1);color:#fff}
+.tab.off:hover{background:rgba(255,255,255,0.18)}
+#tabDash{background:#EAF9FF;color:#0D0D0D}
+#tabDash:hover{background:#D6EFFA}
+#tabExport{background:#034872;border:1.5px solid #034872;color:#FFFFFF}
+#tabExport:hover{background:#023A5E}
+#tabReset{background:transparent;border:1.5px solid #8A8A8A;color:#C9C9C9}
+#tabReset:hover{background:rgba(255,255,255,0.1);color:#fff}
+#tabSave{background:transparent;border:1.5px solid #5DC1FF;color:#5DC1FF}
+#tabSave:hover{background:rgba(93,193,255,0.15)}
+#tabLoad{background:transparent;border:1.5px solid #5DC1FF;color:#5DC1FF}
+#tabLoad:hover{background:rgba(93,193,255,0.15)}
+.clientwrap{display:flex;align-items:center;gap:6px;margin-left:20px}
+.clientlabel{font-size:10px;font-weight:700;color:#8A8A8A;text-transform:uppercase;letter-spacing:0.6px}
+#clientName{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 10px;color:#fff;font-size:12px;font-family:inherit;width:160px}
+#clientName::placeholder{color:#8A8A8A}
+#clientName:focus{outline:none;border-color:#F25D27}
+.body{display:flex;flex:1;overflow:hidden}
+#plan{display:flex;flex:1;overflow:hidden}
+#dash{display:none;flex:1;overflow-y:auto;padding:24px;background:#EAF9FF}
+.rp{width:230px;background:#024873;padding:12px 10px;overflow-y:auto;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.06)}
+.tp{width:215px;background:#013354;padding:12px 10px;overflow-y:auto;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.05)}
+.ap{flex:1;padding:16px 24px;overflow-y:auto;background:#EAF9FF}
+.slabel{font-size:10px;font-weight:700;color:#9FC9DD;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;padding-left:4px}
+.row{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.tick{width:17px;height:17px;border-radius:3px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;line-height:1;transition:all .12s}
+.tick.none{border:2px solid #3D6E88;background:transparent;color:transparent}
+.tick.all{border:2px solid #F25D27;background:#F25D27;color:#FFFFFF}
+.tick.part{border:2px solid #F25D27;background:rgba(242,93,39,0.25);color:#F25D27;font-size:14px}
+.rbtn,.tbtn{width:100%;text-align:left;border:none;border-radius:6px;padding:7px 8px;cursor:pointer;font-size:11.5px;font-family:inherit;transition:all .12s}
+.rbtn.act{background:#F25D27;color:#FFFFFF;font-weight:700}
+.rbtn.sel{background:rgba(242,93,39,0.2);color:#fff}
+.rbtn.idl{background:rgba(255,255,255,0.05);color:#fff}
+.rbtn.idl:hover,.tbtn.idl:hover{background:rgba(255,255,255,0.1)}
+.tbtn.act{background:#5DC1FF;color:#0D0D0D;font-weight:700}
+.tbtn.sel{background:rgba(255,255,255,0.1);color:#BEE3F5}
+.tbtn.idl{background:rgba(255,255,255,0.04);color:#8FB6CB}
+.np{display:inline-block;margin-left:4px;font-size:9px;padding:1px 5px;border-radius:8px;background:rgba(93,193,255,0.25);color:#5DC1FF;font-weight:700;vertical-align:middle}
+.ahdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
+.atitle{font-size:16px;font-weight:700;color:#0D0D0D;margin-top:2px}
+.asub{font-size:11px;color:#5C6B73;margin-top:1px}
+.sall{padding:7px 16px;border:2px solid #F25D27;border-radius:6px;background:transparent;color:#0D0D0D;font-size:11px;font-family:inherit;font-weight:700;cursor:pointer}
+.sall.on{background:#F25D27;color:#FFFFFF}
+.colhdr{display:flex;gap:10px;padding:5px 12px;margin-bottom:7px;font-size:10px;font-weight:700;color:#6B7A82;text-transform:uppercase;letter-spacing:0.8px}
+.arow{display:flex;align-items:center;gap:10px;padding:9px 12px;margin-bottom:6px;background:#fff;border-radius:8px;border:2px solid transparent;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:border-color .12s}
+.arow.sel{border-color:#F25D27}
+.achk{width:19px;height:19px;border-radius:4px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#FFFFFF;transition:all .12s}
+.achk.off{border:2px solid #D9D9D9;background:transparent}
+.achk.on{border:2px solid #F25D27;background:#F25D27}
+.aname{flex:1;font-size:12.5px;color:#0D0D0D;line-height:1.35}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.fa{background:#D6E9F2;color:#024873}
+.aug{background:#DCF1FF;color:#0C6E9E}
+.ho{background:#FCE0D4;color:#B1400F}
+.osel{padding:5px 8px;border-radius:6px;font-family:inherit;font-size:11px;color:#0D0D0D;cursor:pointer;width:140px;transition:all .12s}
+.osel.def{border:1.5px solid #D9D9D9;background:#fff}
+.osel.ovr{border:1.5px solid #F25D27;background:#FFF1EB;color:#F25D27;font-weight:700}
+.ph{display:flex;align-items:center;justify-content:center;height:100%;color:#7C8B93;font-size:13px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.card{background:#fff;border-radius:10px;padding:18px 20px 14px;border-top:4px solid #F25D27;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+.clabel{font-size:10px;font-weight:700;color:#7C8B93;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.cval{font-size:38px;font-weight:800;color:#0D0D0D;line-height:1}
+.csub{font-size:11px;color:#7C8B93;margin-top:4px}
+.cbar{margin-top:10px;height:4px;background:#D9D9D9;border-radius:2px}
+.cbarfill{height:100%;border-radius:2px;transition:width .4s}
+.cpct{font-size:12px;font-weight:700;margin-top:4px}
+.dgrid{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
+.panel{background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+.ptitle{font-size:14px;font-weight:700;color:#0D0D0D;margin-bottom:16px}
+.empty{color:#9FADB4;font-size:12px;line-height:1.6}
+.cbrow{margin-bottom:14px}
+.cbrow-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.cbrow-label{color:#4A5A62;font-weight:700}
+.cbrow-val{color:#0D0D0D;font-weight:700}
+.cbrow-bar{height:8px;background:#EEF3F5;border-radius:4px;overflow:hidden}
+.cbrow-fill{height:100%;border-radius:4px;transition:width .4s}
+.rolebar{margin-bottom:12px}
+.rolebar-top{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;margin-bottom:4px}
+.rolebar-name{color:#0D0D0D;font-weight:700}
+.rolebar-frac{color:#7C8B93}
+.rolebar-track{height:6px;background:#EEF3F5;border-radius:3px;overflow:hidden}
+.rolebar-fill{height:100%;background:#F25D27;border-radius:3px;transition:width .4s}
+.alert{background:#FFF1EB;border:1.5px solid #F25D27;border-radius:8px;padding:12px 16px;margin-top:16px;font-size:12px;color:#B1400F;font-weight:700}
+</style>
+</head>
+<body>
+<div id="bap">
+  <div class="hdr">
+    <div>
+      <div class="htitle">Workmatik RESHAPE - Examine Roles</div>
+      <div class="hsub" id="hsub">25 roles &middot; 422 activities</div>
+    </div>
+    <div class="clientwrap">
+      <span class="clientlabel">Client</span>
+      <input type="text" id="clientName" placeholder="e.g. Acme Corp" oninput="bapClientNameChange()">
+    </div>
+    <div class="tabs">
+      <button class="tab off" id="tabSave" onclick="bapSave()">Save</button>
+      <button class="tab off" id="tabLoad" onclick="bapLoadClick()">Load</button>
+      <input type="file" id="loadFileInput" accept=".json" style="display:none" onchange="bapLoadFile(event)">
+      <button class="tab on" id="tabPlan" onclick="bapSetTab('plan')">Activity Planner</button>
+      <button class="tab off" id="tabDash" onclick="bapSetTab('dash')">Dashboard</button>
+      <button class="tab off" id="tabExport" onclick="bapExport()">Export</button>
+      <button class="tab off" id="tabReset" onclick="bapReset()">Reset</button>
+    </div>
+  </div>
+  <div class="body">
+    <div id="plan">
+      <div class="rp" id="rpanel"></div>
+      <div class="tp" id="tpanel"></div>
+      <div class="ap" id="apanel"></div>
+    </div>
+    <div id="dash"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+const DATA = [{"role":"Content Strategist","task":"Content Planning","activity":"Audience research and persona validation","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Planning","activity":"Editorial calendar creation","cls":"Full automation","type":"Established role"},{"role":"Content Strategist","task":"Content Planning","activity":"Content gap analysis","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Planning","activity":"Topic clustering and pillar page planning","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Planning","activity":"Keyword research for content strategy","cls":"Full automation","type":"Established role"},{"role":"Content Strategist","task":"Content Planning","activity":"Content inventory audit","cls":"Full automation","type":"Established role"},{"role":"Content Strategist","task":"Content Planning","activity":"Setting content KPIs and success metrics","cls":"Human only","type":"Established role"},{"role":"Content Strategist","task":"Content Production Oversight","activity":"Writing content briefs","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Production Oversight","activity":"First draft creation (long-form)","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Production Oversight","activity":"SEO optimisation of existing content","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Production Oversight","activity":"Editing and proofreading","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Production Oversight","activity":"Content repurposing across formats","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Production Oversight","activity":"Tone of voice consistency checking","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Distribution","activity":"Channel selection and distribution planning","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Distribution","activity":"Scheduling and publishing content","cls":"Full automation","type":"Established role"},{"role":"Content Strategist","task":"Content Distribution","activity":"Content syndication management","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Performance Analysis","activity":"Content performance reporting","cls":"Full automation","type":"Established role"},{"role":"Content Strategist","task":"Content Performance Analysis","activity":"A/B test analysis","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Performance Analysis","activity":"Attribution modelling for content","cls":"Augmentation","type":"Established role"},{"role":"Content Strategist","task":"Content Performance Analysis","activity":"Recommending content optimisations","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Research","activity":"Subject matter research","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Research","activity":"Source verification","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Research","activity":"Competitor content research","cls":"Full automation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Research","activity":"SME interview preparation","cls":"Human only","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Blog post writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"White paper and eBook writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Case study writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Website copy writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Ad copy writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Email copy writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Social media copy writing","cls":"Full automation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Video script writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Content Creation","activity":"Thought leadership article writing","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Editing and Quality Control","activity":"Proofreading and grammar checking","cls":"Full automation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Editing and Quality Control","activity":"Fact checking","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Editing and Quality Control","activity":"Brand voice alignment checking","cls":"Augmentation","type":"Established role"},{"role":"Content Writer / Copywriter","task":"Editing and Quality Control","activity":"Readability optimisation","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"Site crawl and audit","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"Page speed analysis","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"Schema markup implementation","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"Core Web Vitals monitoring","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"Redirect mapping","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"XML sitemap management","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"Technical SEO","activity":"Robots.txt configuration","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"On-Page SEO","activity":"Keyword research","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"On-Page SEO","activity":"Meta title and description writing","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"On-Page SEO","activity":"Header tag optimisation","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"On-Page SEO","activity":"Internal linking strategy","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"On-Page SEO","activity":"Content optimisation recommendations","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"Off-Page SEO","activity":"Backlink profile analysis","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"Off-Page SEO","activity":"Link building outreach","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"Off-Page SEO","activity":"Digital PR for link acquisition","cls":"Human only","type":"Established role"},{"role":"SEO Specialist","task":"SEO Reporting","activity":"Rank tracking and reporting","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"SEO Reporting","activity":"Organic traffic analysis","cls":"Full automation","type":"Established role"},{"role":"SEO Specialist","task":"SEO Reporting","activity":"SEO performance dashboard creation","cls":"Augmentation","type":"Established role"},{"role":"SEO Specialist","task":"SEO Reporting","activity":"Competitor SEO benchmarking","cls":"Full automation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Planning","activity":"ICP and persona alignment","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Planning","activity":"Campaign strategy development","cls":"Human only","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Planning","activity":"Budget allocation modelling","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Planning","activity":"Channel mix planning","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Execution","activity":"Landing page creation","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Execution","activity":"Ad copy and creative production","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Execution","activity":"Lead magnet creation","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Execution","activity":"Form and CTA configuration","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Execution","activity":"Paid search campaign setup","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Execution","activity":"Paid social campaign setup","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Lead Management","activity":"Lead scoring model configuration","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Lead Management","activity":"Lead qualification and routing","cls":"Full automation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Lead Management","activity":"Lead nurture sequence creation","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Lead Management","activity":"Lead data enrichment","cls":"Full automation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Optimisation","activity":"A/B test design","cls":"Augmentation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Optimisation","activity":"A/B test results analysis","cls":"Full automation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Optimisation","activity":"Bid management optimisation","cls":"Full automation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Optimisation","activity":"Campaign performance reporting","cls":"Full automation","type":"Established role"},{"role":"Demand Generation Specialist","task":"Campaign Optimisation","activity":"Conversion rate optimisation","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Search (PPC)","activity":"Keyword research and selection","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Search (PPC)","activity":"Ad copy creation","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Search (PPC)","activity":"Campaign structure setup","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Search (PPC)","activity":"Bid strategy configuration","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Search (PPC)","activity":"Negative keyword management","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Search (PPC)","activity":"Quality score optimisation","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Social","activity":"Audience targeting and segmentation","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Social","activity":"Ad creative production","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Social","activity":"Campaign setup and trafficking","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Social","activity":"Frequency and budget pacing","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Paid Social","activity":"Retargeting audience creation","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Display and Programmatic","activity":"Audience segment creation","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Display and Programmatic","activity":"Creative trafficking","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Display and Programmatic","activity":"Brand safety configuration","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Display and Programmatic","activity":"Performance analysis and reporting","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Analytics and Reporting","activity":"UTM and tracking parameter management","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Analytics and Reporting","activity":"Analytics platform configuration","cls":"Augmentation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Analytics and Reporting","activity":"Performance dashboard creation","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Analytics and Reporting","activity":"ROI and ROAS reporting","cls":"Full automation","type":"Established role"},{"role":"Performance Marketing Specialist","task":"Analytics and Reporting","activity":"Attribution modelling","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Social Strategy","activity":"Platform strategy development","cls":"Human only","type":"Established role"},{"role":"Social Media Specialist","task":"Social Strategy","activity":"Content pillar definition","cls":"Human only","type":"Established role"},{"role":"Social Media Specialist","task":"Social Strategy","activity":"Audience growth strategy","cls":"Human only","type":"Established role"},{"role":"Social Media Specialist","task":"Content Creation","activity":"Post copy writing","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Content Creation","activity":"Image and graphic creation","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Content Creation","activity":"Short-form video scripting","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Content Creation","activity":"Hashtag research","cls":"Full automation","type":"Established role"},{"role":"Social Media Specialist","task":"Content Creation","activity":"Content calendar creation","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Community Management","activity":"Comment moderation","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Community Management","activity":"Responding to DMs and enquiries","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Community Management","activity":"Sentiment monitoring","cls":"Full automation","type":"Established role"},{"role":"Social Media Specialist","task":"Community Management","activity":"Brand mention tracking","cls":"Full automation","type":"Established role"},{"role":"Social Media Specialist","task":"Community Management","activity":"Escalation management","cls":"Human only","type":"Established role"},{"role":"Social Media Specialist","task":"Social Analytics","activity":"Engagement rate reporting","cls":"Full automation","type":"Established role"},{"role":"Social Media Specialist","task":"Social Analytics","activity":"Follower growth tracking","cls":"Full automation","type":"Established role"},{"role":"Social Media Specialist","task":"Social Analytics","activity":"Content performance analysis","cls":"Full automation","type":"Established role"},{"role":"Social Media Specialist","task":"Social Analytics","activity":"Social listening and trend analysis","cls":"Augmentation","type":"Established role"},{"role":"Social Media Specialist","task":"Social Analytics","activity":"Competitor social benchmarking","cls":"Full automation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Strategy","activity":"Brand positioning development","cls":"Human only","type":"Established role"},{"role":"Brand Strategist","task":"Brand Strategy","activity":"Brand architecture definition","cls":"Human only","type":"Established role"},{"role":"Brand Strategist","task":"Brand Strategy","activity":"Brand purpose and values articulation","cls":"Human only","type":"Established role"},{"role":"Brand Strategist","task":"Brand Strategy","activity":"Competitive brand landscape analysis","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Strategy","activity":"Brand differentiation strategy","cls":"Human only","type":"Established role"},{"role":"Brand Strategist","task":"Visual Identity","activity":"Visual brand concept development","cls":"Human only","type":"Established role"},{"role":"Brand Strategist","task":"Visual Identity","activity":"Brand guidelines documentation","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Visual Identity","activity":"Asset library management","cls":"Full automation","type":"Established role"},{"role":"Brand Strategist","task":"Visual Identity","activity":"Design template creation","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Visual Identity","activity":"Brand compliance auditing","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Guardianship","activity":"Brand usage policy enforcement","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Guardianship","activity":"Internal brand training development","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Guardianship","activity":"Agency and partner brand briefing","cls":"Human only","type":"Established role"},{"role":"Brand Strategist","task":"Brand Guardianship","activity":"Brand consistency monitoring across channels","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Research","activity":"Brand perception survey design","cls":"Augmentation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Research","activity":"Brand sentiment analysis","cls":"Full automation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Research","activity":"Share of voice tracking","cls":"Full automation","type":"Established role"},{"role":"Brand Strategist","task":"Brand Research","activity":"Brand health dashboard reporting","cls":"Full automation","type":"Established role"},{"role":"Product Marketing Manager","task":"Positioning and Messaging","activity":"Buyer persona development","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Positioning and Messaging","activity":"Value proposition definition","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Positioning and Messaging","activity":"Messaging framework creation","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Positioning and Messaging","activity":"Product narrative development","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Positioning and Messaging","activity":"Competitive positioning","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Go-to-Market Execution","activity":"GTM plan development","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Go-to-Market Execution","activity":"Sales enablement content creation","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Go-to-Market Execution","activity":"Product launch campaign planning","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Go-to-Market Execution","activity":"Internal GTM communications","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Go-to-Market Execution","activity":"Feature announcement copy","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Sales Enablement","activity":"Battle card creation","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Sales Enablement","activity":"Sales deck creation","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Sales Enablement","activity":"Objection handling guide creation","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Sales Enablement","activity":"Product demo script writing","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Sales Enablement","activity":"Sales training content creation","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Market Intelligence","activity":"Win/loss analysis","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Market Intelligence","activity":"Competitor product analysis","cls":"Augmentation","type":"Established role"},{"role":"Product Marketing Manager","task":"Market Intelligence","activity":"Analyst relations preparation","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Market Intelligence","activity":"Customer advisory research","cls":"Human only","type":"Established role"},{"role":"Product Marketing Manager","task":"Market Intelligence","activity":"Category landscape mapping","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"MarTech Management","activity":"CRM configuration and maintenance","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"MarTech Management","activity":"Marketing automation platform management","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"MarTech Management","activity":"MarTech stack evaluation","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"MarTech Management","activity":"Tool integration and workflow building","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"MarTech Management","activity":"Data governance and hygiene","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Campaign Operations","activity":"Campaign build and QA","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Campaign Operations","activity":"List segmentation","cls":"Full automation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Campaign Operations","activity":"Lead routing rule configuration","cls":"Full automation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Campaign Operations","activity":"Email deployment and testing","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Campaign Operations","activity":"UTM and tracking setup","cls":"Full automation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Data and Analytics","activity":"Marketing database management","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Data and Analytics","activity":"Reporting dashboard build","cls":"Full automation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Data and Analytics","activity":"Data enrichment and deduplication","cls":"Full automation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Data and Analytics","activity":"Pipeline and revenue attribution reporting","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Data and Analytics","activity":"Funnel performance analysis","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Process and Compliance","activity":"Marketing process documentation","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Process and Compliance","activity":"GDPR/data compliance management","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Process and Compliance","activity":"Consent and preference management","cls":"Augmentation","type":"Established role"},{"role":"Marketing Operations Specialist","task":"Process and Compliance","activity":"SLA management with sales","cls":"Human only","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Customer Engagement","activity":"Customer newsletter creation","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Customer Engagement","activity":"Customer webinar planning and delivery","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Customer Engagement","activity":"Customer community management","cls":"Human only","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Customer Engagement","activity":"Customer education content creation","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Advocacy and References","activity":"Customer reference identification","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Advocacy and References","activity":"Case study development","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Advocacy and References","activity":"Testimonial collection and curation","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Advocacy and References","activity":"Review site campaign management","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Advocacy and References","activity":"Customer advisory board management","cls":"Human only","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Retention and Expansion","activity":"Renewal campaign planning","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Retention and Expansion","activity":"Upsell/cross-sell campaign execution","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Retention and Expansion","activity":"Customer health scoring","cls":"Full automation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Retention and Expansion","activity":"Churn risk identification","cls":"Full automation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Retention and Expansion","activity":"Expansion opportunity analysis","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Voice of Customer","activity":"NPS survey design and deployment","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Voice of Customer","activity":"VoC interview synthesis","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Voice of Customer","activity":"Customer feedback analysis","cls":"Augmentation","type":"Established role"},{"role":"Customer Marketing Specialist","task":"Voice of Customer","activity":"VoC insight reporting","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Event Planning and Execution","activity":"Event selection and prioritisation","cls":"Human only","type":"Established role"},{"role":"Field Marketing Specialist","task":"Event Planning and Execution","activity":"Venue and supplier sourcing","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Event Planning and Execution","activity":"Event logistics coordination","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Event Planning and Execution","activity":"Booth design briefing","cls":"Human only","type":"Established role"},{"role":"Field Marketing Specialist","task":"Event Planning and Execution","activity":"Speaker and session management","cls":"Human only","type":"Established role"},{"role":"Field Marketing Specialist","task":"Pipeline Generation","activity":"Pre-event prospect outreach","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Pipeline Generation","activity":"Event registration campaign","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Pipeline Generation","activity":"On-site lead capture setup","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Pipeline Generation","activity":"Post-event follow-up campaign","cls":"Full automation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Regional Campaign Execution","activity":"Regional campaign localisation","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Regional Campaign Execution","activity":"Local media and PR outreach","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Regional Campaign Execution","activity":"Account targeting for regional activity","cls":"Augmentation","type":"Established role"},{"role":"Field Marketing Specialist","task":"Regional Campaign Execution","activity":"Regional performance reporting","cls":"Full automation","type":"Established role"},{"role":"ABM Specialist","task":"Account Intelligence","activity":"Target account list selection","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"Account Intelligence","activity":"Account research and profiling","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"Account Intelligence","activity":"Intent data monitoring","cls":"Full automation","type":"Established role"},{"role":"ABM Specialist","task":"Account Intelligence","activity":"Stakeholder mapping","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Campaign Execution","activity":"Personalised content creation","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Campaign Execution","activity":"Account-specific landing page creation","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Campaign Execution","activity":"Direct mail and gifting programme management","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Campaign Execution","activity":"Account advertising setup (LinkedIn/display)","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Campaign Execution","activity":"1:1 executive engagement planning","cls":"Human only","type":"Established role"},{"role":"ABM Specialist","task":"Sales and Marketing Alignment","activity":"Account planning with sales","cls":"Human only","type":"Established role"},{"role":"ABM Specialist","task":"Sales and Marketing Alignment","activity":"ABM playbook development","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"Sales and Marketing Alignment","activity":"Account status reporting","cls":"Full automation","type":"Established role"},{"role":"ABM Specialist","task":"Sales and Marketing Alignment","activity":"Joint ABM campaign review","cls":"Human only","type":"Established role"},{"role":"ABM Specialist","task":"ABM Measurement","activity":"Account engagement scoring","cls":"Full automation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Measurement","activity":"Pipeline influence reporting","cls":"Full automation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Measurement","activity":"ABM programme ROI analysis","cls":"Augmentation","type":"Established role"},{"role":"ABM Specialist","task":"ABM Measurement","activity":"Account progression tracking","cls":"Full automation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Strategy","activity":"Email programme strategy","cls":"Human only","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Strategy","activity":"Audience segmentation strategy","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Strategy","activity":"Sending frequency optimisation","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Creation","activity":"Email copywriting","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Creation","activity":"Email HTML template design","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Creation","activity":"Dynamic content configuration","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Creation","activity":"Subject line creation and testing","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Creation","activity":"Image and asset sourcing","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Automation","activity":"Nurture workflow design","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Automation","activity":"Trigger-based email configuration","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Automation","activity":"Lead scoring integration","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Automation","activity":"Drip campaign building","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Deliverability","activity":"Sender reputation monitoring","cls":"Full automation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Deliverability","activity":"List hygiene and suppression management","cls":"Full automation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Deliverability","activity":"Spam testing","cls":"Full automation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Deliverability","activity":"DKIM/SPF/DMARC configuration","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Analytics","activity":"Open and click rate reporting","cls":"Full automation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Analytics","activity":"A/B test analysis","cls":"Full automation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Analytics","activity":"Revenue attribution from email","cls":"Augmentation","type":"Established role"},{"role":"Email Marketing Specialist","task":"Email Analytics","activity":"Unsubscribe and complaint rate monitoring","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Data Collection and Management","activity":"Data source integration","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Data Collection and Management","activity":"Data pipeline management","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Data Collection and Management","activity":"Data cleaning and normalisation","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Data Collection and Management","activity":"Data dictionary maintenance","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Reporting and Dashboards","activity":"KPI dashboard creation","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Reporting and Dashboards","activity":"Executive reporting","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Reporting and Dashboards","activity":"Channel performance reporting","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Reporting and Dashboards","activity":"Weekly/monthly report automation","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Analysis and Insights","activity":"Funnel conversion analysis","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Analysis and Insights","activity":"Cohort analysis","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Analysis and Insights","activity":"Customer acquisition cost (CAC) analysis","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Analysis and Insights","activity":"Attribution modelling","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Analysis and Insights","activity":"Predictive lead scoring","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Analysis and Insights","activity":"Market sizing and TAM analysis","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Experimentation","activity":"A/B test design","cls":"Human only","type":"Established role"},{"role":"Marketing Data Analyst","task":"Experimentation","activity":"Statistical significance analysis","cls":"Full automation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Experimentation","activity":"Test results interpretation","cls":"Augmentation","type":"Established role"},{"role":"Marketing Data Analyst","task":"Experimentation","activity":"Experiment documentation","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Primary Research","activity":"Survey design","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Primary Research","activity":"Survey deployment and management","cls":"Full automation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Primary Research","activity":"In-depth interview facilitation","cls":"Human only","type":"Established role"},{"role":"Customer Insights Analyst","task":"Primary Research","activity":"Focus group facilitation","cls":"Human only","type":"Established role"},{"role":"Customer Insights Analyst","task":"Primary Research","activity":"Interview transcription","cls":"Full automation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Secondary Research","activity":"Desk research and literature review","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Secondary Research","activity":"Analyst report synthesis","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Secondary Research","activity":"Industry trend analysis","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Secondary Research","activity":"Competitive research","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Analysis","activity":"Qualitative data coding and thematic analysis","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Analysis","activity":"Quantitative data analysis","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Analysis","activity":"Insight synthesis","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Analysis","activity":"Research report writing","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Analysis","activity":"Persona development from research","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Communication","activity":"Research presentation creation","cls":"Augmentation","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Communication","activity":"Insight dissemination across teams","cls":"Human only","type":"Established role"},{"role":"Customer Insights Analyst","task":"Research Communication","activity":"Research repository management","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Enablement","activity":"Partner portal content management","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Enablement","activity":"Partner training material creation","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Enablement","activity":"Co-branded asset production","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Enablement","activity":"Partner newsletter creation","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"MDF Management","activity":"MDF programme management","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"MDF Management","activity":"MDF claim review and approval","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"MDF Management","activity":"Partner activity ROI tracking","cls":"Full automation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Joint Campaign Execution","activity":"Joint webinar planning","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Joint Campaign Execution","activity":"Co-marketing campaign development","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Joint Campaign Execution","activity":"Partner-specific campaign localisation","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Joint Campaign Execution","activity":"Joint event coordination","cls":"Human only","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Performance","activity":"Partner tier performance reporting","cls":"Full automation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Performance","activity":"Partner contribution to pipeline tracking","cls":"Full automation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Performance","activity":"Partner recruitment marketing","cls":"Augmentation","type":"Established role"},{"role":"Partner Marketing Specialist","task":"Partner Performance","activity":"Partner satisfaction tracking","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Competitor Monitoring","activity":"Competitor website and content monitoring","cls":"Full automation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Competitor Monitoring","activity":"Competitor pricing tracking","cls":"Full automation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Competitor Monitoring","activity":"Competitor product feature tracking","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Competitor Monitoring","activity":"Competitor hiring signal monitoring","cls":"Full automation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Competitor Monitoring","activity":"Competitor social media monitoring","cls":"Full automation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Synthesis","activity":"Competitive battle card creation","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Synthesis","activity":"Win/loss data analysis","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Synthesis","activity":"Competitive landscape mapping","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Synthesis","activity":"Market positioning analysis","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Synthesis","activity":"Analyst and review site monitoring","cls":"Full automation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Distribution","activity":"Competitive intelligence newsletter","cls":"Augmentation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Distribution","activity":"Sales team competitive briefing","cls":"Human only","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Distribution","activity":"Competitive alert distribution","cls":"Full automation","type":"Established role"},{"role":"Competitive Intelligence Analyst","task":"Intelligence Distribution","activity":"Executive competitive summary","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Media Relations","activity":"Press release writing","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Media Relations","activity":"Journalist research and targeting","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Media Relations","activity":"Media pitch writing","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Media Relations","activity":"Media relationship management","cls":"Human only","type":"Established role"},{"role":"PR / Communications Specialist","task":"Media Relations","activity":"Press enquiry response","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Thought Leadership","activity":"Thought leadership article writing","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Thought Leadership","activity":"Executive ghostwriting","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Thought Leadership","activity":"Awards submission writing","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Thought Leadership","activity":"Speaking abstract submission writing","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Crisis Communications","activity":"Crisis monitoring","cls":"Full automation","type":"Established role"},{"role":"PR / Communications Specialist","task":"Crisis Communications","activity":"Crisis response messaging","cls":"Human only","type":"Established role"},{"role":"PR / Communications Specialist","task":"Crisis Communications","activity":"Stakeholder communication during crisis","cls":"Human only","type":"Established role"},{"role":"PR / Communications Specialist","task":"Crisis Communications","activity":"Media training coordination","cls":"Human only","type":"Established role"},{"role":"PR / Communications Specialist","task":"PR Measurement","activity":"Media coverage tracking","cls":"Full automation","type":"Established role"},{"role":"PR / Communications Specialist","task":"PR Measurement","activity":"Share of voice analysis","cls":"Full automation","type":"Established role"},{"role":"PR / Communications Specialist","task":"PR Measurement","activity":"Coverage quality scoring","cls":"Augmentation","type":"Established role"},{"role":"PR / Communications Specialist","task":"PR Measurement","activity":"PR impact reporting","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Strategy","activity":"Event programme strategy","cls":"Human only","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Strategy","activity":"Event budget planning","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Strategy","activity":"Event ROI modelling","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Production","activity":"Venue and vendor sourcing","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Production","activity":"Event registration setup","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Production","activity":"Event app and technology setup","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Production","activity":"Speaker briefing and management","cls":"Human only","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Production","activity":"Agenda creation","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Event Production","activity":"Attendee communication","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Demand Generation via Events","activity":"Pre-event promotional campaign","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Demand Generation via Events","activity":"Post-event follow-up sequence","cls":"Full automation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Demand Generation via Events","activity":"On-site lead capture management","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Demand Generation via Events","activity":"Account engagement at events reporting","cls":"Full automation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Virtual and Hybrid Events","activity":"Webinar platform setup and management","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Virtual and Hybrid Events","activity":"Live chat and Q&A moderation","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Virtual and Hybrid Events","activity":"On-demand content repurposing","cls":"Augmentation","type":"Established role"},{"role":"Event Marketing Specialist","task":"Virtual and Hybrid Events","activity":"Webinar recording editing brief","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"CRM and Systems Administration","activity":"CRM data management","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"CRM and Systems Administration","activity":"Revenue tech stack integration","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"CRM and Systems Administration","activity":"CRM workflow and automation setup","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"CRM and Systems Administration","activity":"Data quality monitoring","cls":"Full automation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"CRM and Systems Administration","activity":"User access and permission management","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Pipeline and Forecast Management","activity":"Pipeline reporting and analysis","cls":"Full automation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Pipeline and Forecast Management","activity":"Forecast modelling","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Pipeline and Forecast Management","activity":"Deal velocity analysis","cls":"Full automation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Pipeline and Forecast Management","activity":"Stage conversion rate tracking","cls":"Full automation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Process Design","activity":"Lead-to-revenue process mapping","cls":"Human only","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Process Design","activity":"SLA definition between marketing and sales","cls":"Human only","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Process Design","activity":"Funnel stage criteria definition","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Process Design","activity":"Process documentation","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Revenue Analytics","activity":"Revenue attribution reporting","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Revenue Analytics","activity":"Customer acquisition cost tracking","cls":"Full automation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Revenue Analytics","activity":"LTV/CAC ratio analysis","cls":"Full automation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Revenue Analytics","activity":"Cohort retention analysis","cls":"Augmentation","type":"Established role"},{"role":"Revenue Operations Specialist","task":"Revenue Analytics","activity":"Territory and quota analysis","cls":"Augmentation","type":"Established role"},{"role":"GEO Specialist","task":"Search Visibility Strategy","activity":"Define AI search optimisation goals","cls":"Augmentation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Search Visibility Strategy","activity":"Map target AI platforms (ChatGPT, Perplexity, Gemini, Copilot)","cls":"Augmentation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Search Visibility Strategy","activity":"Competitive AI visibility audit","cls":"Full automation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Search Visibility Strategy","activity":"Identify citation-worthy content assets","cls":"Augmentation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Content Optimisation for AI Search","activity":"Optimise content structure for AI retrieval","cls":"Augmentation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Content Optimisation for AI Search","activity":"Develop answer-format content (FAQs, definitions, comparisons)","cls":"Augmentation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Content Optimisation for AI Search","activity":"Build authoritative source relationships for AI citation","cls":"Human only","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"Content Optimisation for AI Search","activity":"Monitor AI search result appearances","cls":"Full automation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"GEO Measurement","activity":"Track brand mentions in AI-generated answers","cls":"Full automation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"GEO Measurement","activity":"Sentiment analysis of AI-generated brand references","cls":"Full automation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"GEO Measurement","activity":"GEO performance reporting","cls":"Full automation","type":"New AI-enabled role"},{"role":"GEO Specialist","task":"GEO Measurement","activity":"Prompt testing to track AI search visibility","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Tool and Agent Management","activity":"AI tool evaluation and selection","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Tool and Agent Management","activity":"AI agent configuration and deployment","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Tool and Agent Management","activity":"Prompt library creation and maintenance","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Tool and Agent Management","activity":"AI workflow integration with MarTech stack","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Tool and Agent Management","activity":"AI output quality monitoring","cls":"Human only","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Process Design","activity":"Map AI automation opportunities in marketing workflows","cls":"Human only","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Process Design","activity":"Design human-in-the-loop review processes","cls":"Human only","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Process Design","activity":"AI governance documentation","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Process Design","activity":"Define AI usage policies for marketing","cls":"Human only","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Performance Measurement","activity":"AI tool ROI tracking","cls":"Full automation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Performance Measurement","activity":"AI output accuracy monitoring","cls":"Augmentation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Performance Measurement","activity":"Time and cost savings reporting from AI automation","cls":"Full automation","type":"New AI-enabled role"},{"role":"AI Marketing Operations Specialist","task":"AI Performance Measurement","activity":"AI error and hallucination auditing","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Strategy","activity":"Conversational AI use case mapping","cls":"Human only","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Strategy","activity":"Chatbot persona and tone definition","cls":"Human only","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Strategy","activity":"Channel selection (web, messaging, voice)","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Chatbot and VA Development","activity":"Conversation flow design","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Chatbot and VA Development","activity":"Intent and entity training","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Chatbot and VA Development","activity":"Integration with CRM and marketing automation","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Chatbot and VA Development","activity":"Fallback and escalation path design","cls":"Human only","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Chatbot and VA Development","activity":"A/B testing conversation flows","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Marketing Execution","activity":"Lead qualification via chatbot","cls":"Full automation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Marketing Execution","activity":"Meeting booking automation","cls":"Full automation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Marketing Execution","activity":"Personalised content recommendation via chat","cls":"Full automation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Marketing Execution","activity":"Post-conversation follow-up automation","cls":"Full automation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Analytics","activity":"Chat completion rate tracking","cls":"Full automation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Analytics","activity":"Conversation quality analysis","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Analytics","activity":"Intent recognition accuracy monitoring","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Conversational AI Specialist","task":"Conversational Analytics","activity":"Revenue influenced by conversational AI reporting","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Risk and Compliance","activity":"EU AI Act Article 4 compliance assessment","cls":"Human only","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Risk and Compliance","activity":"AI use case risk classification","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Risk and Compliance","activity":"GDPR impact assessment for AI tools","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Risk and Compliance","activity":"Bias and fairness auditing of AI outputs","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Risk and Compliance","activity":"AI vendor due diligence","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"Governance Framework","activity":"AI usage policy development","cls":"Human only","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"Governance Framework","activity":"AI ethical guidelines for marketing","cls":"Human only","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"Governance Framework","activity":"Employee AI literacy training programme","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"Governance Framework","activity":"AI incident response planning","cls":"Human only","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Transparency and Reporting","activity":"AI disclosure labelling on content","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Transparency and Reporting","activity":"Regulatory reporting on AI usage","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Transparency and Reporting","activity":"AI governance audit trail management","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Marketing AI Governance Specialist","task":"AI Transparency and Reporting","activity":"Stakeholder AI risk reporting","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Visual Content Production","activity":"AI image generation for campaigns","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Visual Content Production","activity":"AI video generation and editing","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Visual Content Production","activity":"Avatar and synthetic spokesperson creation","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Visual Content Production","activity":"Visual content quality review and brand alignment","cls":"Human only","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Voice and Audio Production","activity":"AI voiceover generation for video and podcast","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Voice and Audio Production","activity":"Voice cloning programme management","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"AI Voice and Audio Production","activity":"Audio quality review and brand alignment","cls":"Human only","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Content Personalisation at Scale","activity":"Dynamic content variable definition","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Content Personalisation at Scale","activity":"Personalised video at scale production","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Content Personalisation at Scale","activity":"Hyper-personalised email content generation","cls":"Full automation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Content Personalisation at Scale","activity":"A/B testing synthetic vs human content","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Synthetic Content Governance","activity":"AI-generated content disclosure policy","cls":"Human only","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Synthetic Content Governance","activity":"Deepfake detection and brand protection","cls":"Augmentation","type":"New AI-enabled role"},{"role":"Synthetic Content Specialist","task":"Synthetic Content Governance","activity":"Synthetic content rights and IP management","cls":"Human only","type":"New AI-enabled role"}];
+const FA = "Full automation", AUG = "Augmentation", HO = "Human only";
+const C = {primary:"#F25D27", blue:"#5DC1FF", darkblue:"#024873", pale:"#EAF9FF", grey:"#D9D9D9", ink:"#0D0D0D"};
+
+let scope = new Set();
+let ovr = {};
+let vRole = null, vTask = null;
+let currentTab = "plan";
+
+const roles = [...new Set(DATA.map(d=>d.role))];
+const roleType = {};
+DATA.forEach(d=>{ roleType[d.role] = d.type; });
+
+function tasksForRole(r){ return [...new Set(DATA.filter(d=>d.role===r).map(d=>d.task))]; }
+function rIdxs(r){ return DATA.map((d,i)=>d.role===r?i:-1).filter(i=>i>=0); }
+function tIdxs(r,t){ return DATA.map((d,i)=>(d.role===r&&d.task===t)?i:-1).filter(i=>i>=0); }
+function stateOf(idxs){
+  const sel = idxs.filter(i=>scope.has(i)).length;
+  if(sel===0) return "none";
+  if(sel===idxs.length) return "all";
+  return "part";
+}
+function toggleIdxs(idxs){
+  const st = stateOf(idxs);
+  if(st==="all"){ idxs.forEach(i=>scope.delete(i)); }
+  else { idxs.forEach(i=>scope.add(i)); }
+}
+function cls(i){ return ovr[i] || DATA[i].cls; }
+
+function bapSetTab(t){
+  currentTab = t;
+  document.getElementById("tabPlan").className = "tab " + (t==="plan"?"on":"off");
+  document.getElementById("tabDash").className = "tab " + (t==="dash"?"on":"off");
+  document.getElementById("plan").style.display = t==="plan" ? "flex" : "none";
+  document.getElementById("dash").style.display = t==="dash" ? "block" : "none";
+  if(t==="dash") renderDash();
+}
+window.bapSetTab = bapSetTab;
+
+function renderRoles(){
+  const el = document.getElementById("rpanel");
+  let h = '<div class="slabel">Roles (' + roles.length + ')</div>';
+  roles.forEach(r=>{
+    const idxs = rIdxs(r);
+    const st = stateOf(idxs);
+    const tickCls = st==="all"?"all":st==="part"?"part":"none";
+    const tickChar = st==="all"?"&#10003;":st==="part"?"&minus;":"";
+    const btnCls = vRole===r ? "act" : (st!=="none" ? "sel" : "idl");
+    const isNew = roleType[r] === "New AI-enabled role";
+    h += '<div class="row">' +
+      '<div class="tick ' + tickCls + '" data-act="tr" data-r="' + esc(r) + '">' + tickChar + '</div>' +
+      '<button class="rbtn ' + btnCls + '" data-act="vr" data-r="' + esc(r) + '">' + esc(r) + (isNew?'<span class="np">NEW</span>':'') + '</button>' +
+      '</div>';
+  });
+  el.innerHTML = h;
+}
+
+function renderTasks(){
+  const el = document.getElementById("tpanel");
+  if(!vRole){ el.innerHTML = '<div class="ph" style="padding:20px;text-align:center;">Select a role</div>'; return; }
+  const tasks = tasksForRole(vRole);
+  let h = '<div class="slabel">' + esc(vRole) + '</div>';
+  tasks.forEach(t=>{
+    const idxs = tIdxs(vRole,t);
+    const st = stateOf(idxs);
+    const tickCls = st==="all"?"all":st==="part"?"part":"none";
+    const tickChar = st==="all"?"&#10003;":st==="part"?"&minus;":"";
+    const btnCls = vTask===t ? "act" : (st!=="none" ? "sel" : "idl");
+    h += '<div class="row">' +
+      '<div class="tick ' + tickCls + '" data-act="tt" data-r="' + esc(vRole) + '" data-t="' + esc(t) + '">' + tickChar + '</div>' +
+      '<button class="tbtn ' + btnCls + '" data-act="vt" data-r="' + esc(vRole) + '" data-t="' + esc(t) + '">' + esc(t) + '</button>' +
+      '</div>';
+  });
+  el.innerHTML = h;
+}
+
+function badgeCls(c){ return c===FA?"fa":c===AUG?"aug":"ho"; }
+
+function renderActs(){
+  const el = document.getElementById("apanel");
+  if(!vRole || !vTask){ el.innerHTML = '<div class="ph">&larr; Select a role, then a task</div>'; return; }
+  const idxs = tIdxs(vRole, vTask);
+  const st = stateOf(idxs);
+  let h = '<div class="ahdr"><div><div class="asub">' + esc(vRole) + '</div><div class="atitle">' + esc(vTask) + '</div></div>' +
+    '<button class="sall ' + (st==="all"?"on":"") + '" data-act="sa">' + (st==="all"?"Deselect all":"Select all") + '</button></div>';
+  h += '<div class="colhdr"><div style="width:19px"></div><div style="flex:1">Activity</div><div style="width:150px">Default</div><div style="width:150px">Override</div></div>';
+  idxs.forEach(i=>{
+    const sel = scope.has(i);
+    const isOvr = !!ovr[i];
+    const c = cls(i);
+    h += '<div class="arow ' + (sel?"sel":"") + '">' +
+      '<div class="achk ' + (sel?"on":"off") + '" data-act="ta" data-i="' + i + '">' + (sel?"&#10003;":"") + '</div>' +
+      '<div class="aname">' + esc(DATA[i].activity) + '</div>' +
+      '<div style="width:150px"><span class="badge ' + badgeCls(DATA[i].cls) + '">' + esc(DATA[i].cls) + '</span></div>' +
+      '<div style="width:150px"><select class="osel ' + (isOvr?"ovr":"def") + '" data-act="ov" data-i="' + i + '">' +
+        '<option value="">' + (isOvr?"Reset to default":"No override") + '</option>' +
+        [FA,AUG,HO].filter(x=>x!==DATA[i].cls).map(x=>'<option value="'+x+'" '+(ovr[i]===x?"selected":"")+'>'+x+'</option>').join('') +
+      '</select></div>' +
+      '</div>';
+  });
+  el.innerHTML = h;
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function metrics(){
+  const idxs = [...scope];
+  const total = idxs.length;
+  const counts = {}; counts[FA]=0; counts[AUG]=0; counts[HO]=0;
+  idxs.forEach(i=>{ counts[cls(i)]++; });
+  const pcts = {};
+  [FA,AUG,HO].forEach(k=>{ pcts[k] = total? Math.round(counts[k]/total*100) : 0; });
+  const scopedRoles = roles.filter(r=> rIdxs(r).some(i=>scope.has(i))).length;
+  const overrideCount = Object.keys(ovr).length;
+  return {total, counts, pcts, scopedRoles, totalRoles: roles.length, overrideCount};
+}
+
+function csvEscape(s){
+  s = String(s);
+  if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+  return s;
+}
+
+function bapExport(){
+  const idxs = [...scope].sort((a,b)=>a-b);
+  if(idxs.length === 0){
+    alert("No activities selected yet. Use the Activity Planner to select roles and activities, then export.");
+    return;
+  }
+  const clientName = document.getElementById("clientName").value.trim();
+  const headers = ["Client","Role","Role Type","Task","Activity","AI Suitability Classification","Overridden"];
+  const rows = [headers];
+  idxs.forEach(i=>{
+    const d = DATA[i];
+    const isOvr = !!ovr[i];
+    rows.push([clientName, d.role, d.type, d.task, d.activity, cls(i), isOvr ? "Yes" : "No"]);
+  });
+  const csv = rows.map(r=>r.map(csvEscape).join(",")).join("\r\n");
+  const blob = new Blob(["﻿" + csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const ts = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = "Workmatik-RESHAPE-export-" + sanitizeFileToken(clientName) + "-" + ts + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+window.bapExport = bapExport;
+
+function bapReset(){
+  if(scope.size === 0 && Object.keys(ovr).length === 0){
+    return;
+  }
+  const ok = confirm("Reset all role/activity selections and overrides back to defaults? This can't be undone.");
+  if(!ok) return;
+  scope = new Set();
+  ovr = {};
+  vRole = null;
+  vTask = null;
+  currentTab = "plan";
+  bapSetTab("plan");
+  refresh();
+}
+window.bapReset = bapReset;
+
+function sanitizeFileToken(s){
+  return String(s).trim().replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "Client";
+}
+
+function bapClientNameChange(){
+  const name = document.getElementById("clientName").value.trim();
+  document.getElementById("hsub").textContent = "25 roles · 422 activities" + (name ? " · " + name : "");
+}
+
+function bapSave(){
+  const clientName = document.getElementById("clientName").value.trim();
+  const data = {
+    tool: "Workmatik RESHAPE - Examine Roles",
+    version: 1,
+    clientName: clientName,
+    savedAt: new Date().toISOString(),
+    scope: [...scope].sort((a,b)=>a-b),
+    overrides: ovr
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const ts = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = "Workmatik-RESHAPE-" + sanitizeFileToken(clientName) + "-" + ts + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+window.bapSave = bapSave;
+
+function bapLoadClick(){
+  document.getElementById("loadFileInput").click();
+}
+window.bapLoadClick = bapLoadClick;
+
+function bapLoadFile(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    let data;
+    try {
+      data = JSON.parse(e.target.result);
+    } catch(err){
+      alert("This file couldn't be read as a saved Workmatik RESHAPE progress file.");
+      event.target.value = "";
+      return;
+    }
+    if(!data || !Array.isArray(data.scope)){
+      alert("This file doesn't look like a valid saved progress file.");
+      event.target.value = "";
+      return;
+    }
+    scope = new Set(data.scope.filter(i=>Number.isInteger(i) && i>=0 && i<DATA.length));
+    ovr = {};
+    if(data.overrides && typeof data.overrides === "object"){
+      Object.keys(data.overrides).forEach(k=>{
+        const idx = parseInt(k,10);
+        const val = data.overrides[k];
+        if(Number.isInteger(idx) && idx>=0 && idx<DATA.length && [FA,AUG,HO].includes(val)){
+          ovr[idx] = val;
+        }
+      });
+    }
+    document.getElementById("clientName").value = data.clientName || "";
+    bapClientNameChange();
+    vRole = null;
+    vTask = null;
+    currentTab = "plan";
+    bapSetTab("plan");
+    refresh();
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+window.bapLoadFile = bapLoadFile;
+
+function renderDash(){
+  const el = document.getElementById("dash");
+  const m = metrics();
+  const totalActs = DATA.length;
+  const cards = [
+    {label:"Roles in Scope", val:m.scopedRoles, sub:'of ' + m.totalRoles + ' roles', pct: Math.round(m.scopedRoles/m.totalRoles*100)||0, accent:C.primary},
+    {label:"Activities in Scope", val:m.total, sub:'of ' + totalActs + ' total activities', pct: Math.round(m.total/totalActs*100)||0, accent:C.blue},
+    {label:"Full Automation", val:m.counts[FA]||0, sub:"of selected activities", pct:m.pcts[FA]||0, accent:C.darkblue},
+    {label:"Human Only", val:m.counts[HO]||0, sub:"of selected activities", pct:m.pcts[HO]||0, accent:C.primary},
+  ];
+  let h = '<div class="g4">';
+  cards.forEach(c=>{
+    h += '<div class="card" style="border-top-color:' + c.accent + '">' +
+      '<div class="clabel">' + c.label + '</div>' +
+      '<div class="cval">' + c.val + '</div>' +
+      '<div class="csub">' + c.sub + '</div>' +
+      '<div class="cbar"><div class="cbarfill" style="width:' + c.pct + '%;background:' + c.accent + '"></div></div>' +
+      '<div class="cpct" style="color:' + c.accent + '">' + c.pct + '%</div>' +
+      '</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="dgrid">';
+  h += '<div class="panel"><div class="ptitle">AI Classification Breakdown</div>';
+  if(m.total===0){
+    h += '<div class="empty">No activities in scope yet. Use the Activity Planner to select roles and activities &mdash; then return here to see the breakdown.</div>';
+  } else {
+    [[FA,C.darkblue],[AUG,C.blue],[HO,C.primary]].forEach(([k,color])=>{
+      h += '<div class="cbrow"><div class="cbrow-top"><span class="cbrow-label">' + k + '</span><span class="cbrow-val">' + (m.counts[k]||0) + ' (' + (m.pcts[k]||0) + '%)</span></div>' +
+        '<div class="cbrow-bar"><div class="cbrow-fill" style="width:' + (m.pcts[k]||0) + '%;background:' + color + '"></div></div></div>';
+    });
+  }
+  h += '</div>';
+
+  h += '<div class="panel"><div class="ptitle">Activity Selection by Role</div>';
+  roles.forEach(r=>{
+    const idxs = rIdxs(r);
+    const sel = idxs.filter(i=>scope.has(i)).length;
+    const pct = Math.round(sel/idxs.length*100)||0;
+    const isNew = roleType[r]==="New AI-enabled role";
+    h += '<div class="rolebar"><div class="rolebar-top"><span class="rolebar-name">' + esc(r) + (isNew?'<span class="np">NEW</span>':'') + '</span><span class="rolebar-frac">' + sel + '/' + idxs.length + '</span></div>' +
+      '<div class="rolebar-track"><div class="rolebar-fill" style="width:' + pct + '%"></div></div></div>';
+  });
+  h += '</div></div>';
+
+  if(m.overrideCount > 0){
+    h += '<div class="alert">' + m.overrideCount + ' activity classification' + (m.overrideCount===1?'':'s') + ' overridden from default.</div>';
+  }
+  el.innerHTML = h;
+}
+
+document.getElementById("bap").addEventListener("click", ev=>{
+  const el = ev.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act;
+  if(act==="vr"){ vRole=el.dataset.r; vTask=null; refresh(); }
+  else if(act==="vt"){ vTask=el.dataset.t; renderActs(); }
+  else if(act==="tr"){ toggleIdxs(rIdxs(el.dataset.r)); refresh(); }
+  else if(act==="tt"){ toggleIdxs(tIdxs(el.dataset.r, el.dataset.t)); refresh(); }
+  else if(act==="ta"){ const i=+el.dataset.i; scope.has(i)?scope.delete(i):scope.add(i); renderActs(); renderRoles(); renderTasks(); }
+  else if(act==="sa"){ const idxs=tIdxs(vRole,vTask); toggleIdxs(idxs); refresh(); }
+});
+
+document.getElementById("bap").addEventListener("change", ev=>{
+  if(ev.target.dataset.act==="ov"){
+    const i = +ev.target.dataset.i;
+    if(ev.target.value) ovr[i] = ev.target.value; else delete ovr[i];
+    renderActs();
+  }
+});
+
+function refresh(){
+  renderRoles();
+  renderTasks();
+  renderActs();
+  if(currentTab==="dash") renderDash();
+}
+
+refresh();
+})();
+</script>
+</body>
+</html>
